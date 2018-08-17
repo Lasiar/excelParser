@@ -3,7 +3,6 @@ package main
 import (
 	"net/http"
 	"time"
-	"fmt"
 )
 
 func ProcessedHandle(w http.ResponseWriter, r *http.Request) {
@@ -11,8 +10,9 @@ func ProcessedHandle(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Disposition", "attachment; filename=\"Результаты анализа стабильности оборудования.xlsx\"")
 	begin, _ := time.Parse("2006-01-02 15:03:05", "2018-07-01 00:00:00")
 	end, _ := time.Parse("2006-01-02 15:03:05", "2018-07-30 00:00:00")
-	data := parse(begin, end)
-	file := create(data)
-	fmt.Println(file.DefinedNames)
-	file.Write(w)
+
+	parse(begin, end)
+	//	file := create(data)
+	//	fmt.Println(file.DefinedNames)
+	//	file.Write(w)
 }

@@ -1,29 +1,18 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/tealeg/xlsx"
 	"log"
-	"encoding/json"
 	"os"
 )
 
 const (
-	nameDeviceColumn = iota
-	numbersHourseColumn
-	powerOutageColumn
-	HardwareMalfunctionColumn
-	SoftwareFailureColumn
-	SensorResourceGenerationColumn
-	ShutdownForMaintenanceColumn
-	MetrologicalMaintenanceColumn
-	StableWorkHourseColumn
-	StableWorkPrcentColumn
 	allColumn = 10
 )
 
 type PreLoad struct {
 	Device `json:"Device"`
-
 }
 
 func loadFailure() (map[int]string, map[string]int) {
@@ -56,7 +45,7 @@ func create(data DataTable) *xlsx.File {
 
 	totalStyle := xlsx.NewStyle()
 
-	totalStyle.Font.Bold=true
+	totalStyle.Font.Bold = true
 
 	file := xlsx.NewFile()
 	sheet, err := file.AddSheet("анализ работы оборудования")
@@ -87,14 +76,14 @@ func create(data DataTable) *xlsx.File {
 			var unstableWork float64
 			for i := 0; i < 6; i++ {
 				cell := row.AddCell()
-				cell.SetFloat(data.Apn[point][device][i] / 60 / 60)
-				unstableWork += data.Apn[point][device][i] / 60 / 60
-				total[i] += data.Apn[point][device][i] / 60 / 60
+				cell.SetFloat(data.Apn[point][device][i])
+				unstableWork += data.Apn[point][device][i]
+				total[i] += data.Apn[point][device][i]
 			}
 			cell = row.AddCell()
 			cell.SetFloat(data.AllHours - unstableWork)
 			cell = row.AddCell()
-			cell.SetFloat(100 - (unstableWork /data.AllHours  * 100))
+			cell.SetFloat(100 - (unstableWork / data.AllHours * 100))
 			cell.SetStyle(totalStyle)
 		}
 		row := sheet.AddRow()
