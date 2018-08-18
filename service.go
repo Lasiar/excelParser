@@ -26,9 +26,13 @@ func (p *preload) Converter() Apn {
 		for _, wanted := range wantedArr {
 			if _, ok := apn[point][wanted]; !ok {
 				apn[point][wanted] = make(ValueByMaint)
+				for _, v := range p.Reason {
+					apn[point][wanted][v] = 0
+				}
 			}
 		}
 	}
+	return apn
 }
 
 func (p *preload) load() {

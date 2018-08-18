@@ -11,10 +11,6 @@ const (
 	allColumn = 10
 )
 
-type PreLoad struct {
-	Device `json:"Device"`
-}
-
 func loadFailure() (map[int]string, map[string]int) {
 	failureSource := make(map[string]int)
 	file, err := os.Open("failure.json")

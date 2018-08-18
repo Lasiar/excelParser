@@ -3,12 +3,14 @@ package main
 import (
 	"github.com/tealeg/xlsx"
 	"log"
+	"strings"
 	"time"
 )
 
 const (
 	locateName  = 3
 	deviceName  = 4
+	model       = 5
 	timeBegin   = 8
 	timeEnd     = 9
 	CauseColumn = 23
@@ -21,11 +23,23 @@ type DataTable struct {
 
 type Apn map[string]Device
 type Device map[string]ValueByMaint
+
+func (d Device) stringFind(findString ...string) string {
+	str := strings.Join(findString, "")
+	find := ""
+	for k := range d {
+		if strings.Index(str, k) > -1 {
+			find = k
+		}
+	}
+	return find
+}
+
 type ValueByMaint map[int]float64
 
 func parse(begin, end time.Time) DataTable {
 
-	xlFile, err := xlsx.OpenFile("table.xlsx")
+	xlFile, err := xlsx.OpenFile("test.xlsx")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -38,7 +52,9 @@ func parse(begin, end time.Time) DataTable {
 
 	dataTable.AllHours = float64(end.Unix()-begin.Unix()) / 3600
 
-	cause := GetPreload()
+	preload := GetPreload()
+
+	list := preload.Converter()
 
 	for i, row := range sheet.Rows {
 
@@ -75,21 +91,24 @@ func parse(begin, end time.Time) DataTable {
 
 		dt := float64(t1.Unix()-t0.Unix()) / 3600
 
-		if _, ok := cause[cells[locateName].String()]; !ok {
-			cause[cells[locateName].String()] = make(Device)
-		}
-		if _, ok := cause[cells[locateName].String()][cells[deviceName].String()]; !ok {
-			cause[cells[locateName].String()][cells[deviceName].String()] = make(ValueByMaint)
+		if _, ok := list[cells[locateName].String()]; !ok {
+			continue
 		}
 
-		v, ok := failure[cells[CauseColumn].String()]
+		failure := list[cells[locateName].String()].stringFind(cells[deviceName].String(), cells[model].String())
+
+		if _, ok := list[cells[locateName].String()][failure]; !ok {
+			continue
+		}
+
+		v, ok := preload.Reason[cells[CauseColumn].String()]
 		if !ok {
 			continue
 		}
 
-		cause[cells[locateName].String()][cells[deviceName].String()][v] += dt
+		list[cells[locateName].String()][failure][v] += dt
 
 	}
-	dataTable.Apn = cause
+	dataTable.Apn = list
 	return dataTable
 }
