@@ -91,13 +91,17 @@ func parse(begin, end time.Time) DataTable {
 
 		dt := float64(t1.Unix()-t0.Unix()) / 3600
 
-		if _, ok := list[cells[locateName].String()]; !ok {
+		currentLocateName := cells[locateName].String()
+		currentDeviceName := cells[deviceName].String()
+		currentModel := cells[model].String()
+
+		if _, ok := list[currentLocateName]; !ok {
 			continue
 		}
 
-		failure := list[cells[locateName].String()].stringFind(cells[deviceName].String(), cells[model].String())
+		failure := list[currentLocateName].stringFind(currentDeviceName, currentModel)
 
-		if _, ok := list[cells[locateName].String()][failure]; !ok {
+		if _, ok := list[currentLocateName][failure]; !ok {
 			continue
 		}
 
@@ -106,7 +110,7 @@ func parse(begin, end time.Time) DataTable {
 			continue
 		}
 
-		list[cells[locateName].String()][failure][v] += dt
+		list[currentLocateName][failure][v] += dt
 
 	}
 	dataTable.Apn = list
