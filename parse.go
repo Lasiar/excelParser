@@ -105,8 +105,8 @@ func parse(begin, end time.Time) DataTable {
 			continue
 		}
 
-		v, ok := preload.Reason[cells[CauseColumn].String()]
-		if !ok {
+		v := preload.IdReason(cells[CauseColumn].String())
+		if v == -1 {
 			continue
 		}
 

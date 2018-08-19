@@ -13,24 +13,41 @@ var (
 )
 
 type preload struct {
-	Reason map[string]int      `json:"reason"`
-	Apn    map[string][]string `json:"apn"`
+	Reason []string         `json:"reason"`
+	Device []string         `json:"device"`
+	Apn    map[string][]int `json:"apn"`
+}
+
+func (p *preload) IdReason(find string) int {
+	for i, reason := range p.Reason {
+		if reason == find {
+			return i
+		}
+	}
+	return -1
 }
 
 func (p *preload) Converter() Apn {
 	apn := make(Apn)
-	for point, wantedArr := range p.Apn {
+
+	for point, idsDevice := range p.Apn {
+
 		if _, ok := apn[point]; !ok {
 			apn[point] = make(Device)
 		}
-		for _, wanted := range wantedArr {
-			if _, ok := apn[point][wanted]; !ok {
-				apn[point][wanted] = make(ValueByMaint)
-				for _, v := range p.Reason {
-					apn[point][wanted][v] = 0
-				}
+
+		for idDevice := range idsDevice {
+
+			if _, ok := apn[point][p.Device[idDevice]]; !ok {
+				apn[point][p.Device[idDevice]] = make(ValueByMaint)
 			}
+
+			for i := range p.Reason {
+				apn[point][p.Device[idDevice]][i] = 0.0
+			}
+
 		}
+
 	}
 	return apn
 }
