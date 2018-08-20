@@ -38,7 +38,7 @@ func (d Device) stringFind(findString ...string) string {
 
 type ValueByMaint map[int]float64
 
-func parse(begin, end time.Time) DataTable {
+func parse(begin, end time.Time, p preload) DataTable {
 
 	xlFile, err := xlsx.OpenFile("test.xlsx")
 	if err != nil {
@@ -53,9 +53,8 @@ func parse(begin, end time.Time) DataTable {
 
 	dataTable.AllHours = float64(end.Unix()-begin.Unix()) / 3600
 
-	preload := GetPreload()
-
-	list := preload.Converter()
+	p.load()
+	list := p.Converter()
 
 	for i, row := range sheet.Rows {
 
@@ -96,17 +95,13 @@ func parse(begin, end time.Time) DataTable {
 		currentDeviceName := cells[deviceName].String()
 		currentModel := cells[model].String()
 
-		if _, ok := list[currentLocateName]; !ok {
-			continue
-		}
-
 		failure := list[currentLocateName].stringFind(currentDeviceName, currentModel)
 
 		if _, ok := list[currentLocateName][failure]; !ok {
 			continue
 		}
 
-		v := preload.IdReason(cells[CauseColumn].String())
+		v := p.IdReason(cells[CauseColumn].String())
 		if v == -1 {
 			continue
 		}

@@ -38,7 +38,9 @@ func (p *preload) Converter() Apn {
 
 		for idDevice := range idsDevice {
 
-			if _, ok := apn[point][p.Device[idDevice]]; !ok {
+			id := p.Device[idDevice]
+
+			if _, ok := apn[point][id]; !ok {
 				apn[point][p.Device[idDevice]] = make(ValueByMaint)
 			}
 
