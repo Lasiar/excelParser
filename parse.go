@@ -25,14 +25,15 @@ type Apn map[string]Device
 type Device map[string]ValueByMaint
 
 func (d Device) stringFind(findString ...string) string {
+
 	str := strings.Join(findString, "")
-	find := ""
+
 	for k := range d {
 		if strings.Index(str, k) > -1 {
-			find = k
+			return k
 		}
 	}
-	return find
+	return ""
 }
 
 type ValueByMaint map[int]float64

@@ -9,15 +9,33 @@ import (
 	"time"
 )
 
-func ProcessedHandle(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-	w.Header().Set("Content-Disposition", "attachment; filename=\"Результаты анализа стабильности оборудования.xlsx\"")
-	begin, _ := time.Parse("2006-01-02 15:03:05", "2018-07-01 00:00:00")
-	end, _ := time.Parse("2006-01-02 15:03:05", "2018-07-30 00:00:00")
+type message struct {
+	Select preload `json:"select"`
+	Month  string  `json:"month"`
+}
 
-	data := parse(begin, end)
+func ProcessedHandle(w http.ResponseWriter, r *http.Request) {
+	//w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	//w.Header().Set("Content-Disposition", "attachment; filename=\"Результаты анализа стабильности оборудования.xlsx\"")
+
+	dateString := r.FormValue("mounth")
+
+	if dateString == "" {
+		log.Println("bad reqest")
+	}
+
+	date, err := time.Parse("2006-01", dateString)
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	data := parse(date, date.AddDate(0, 1, 0).Add(-time.Nanosecond))
+
 	file := create(data)
+
 	fmt.Println(file.DefinedNames)
+
 	file.Write(w)
 }
 
@@ -28,6 +46,11 @@ func AddElement(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	existPre := GetPreload()
+
+	if pre.Device != nil {
+		existPre.Device = append(existPre.Device, pre.Device...)
+	}
+
 	for k, v := range pre.Apn {
 		if _, ok := pre.Apn[k]; !ok {
 			existPre.Apn[k] = v
