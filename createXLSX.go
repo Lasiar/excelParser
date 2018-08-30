@@ -31,10 +31,11 @@ func loadFailure() (map[int]string, map[string]int) {
 func create(data DataTable) *xlsx.File {
 	headers := [allColumn]string{"Наименование оборудования",
 		"Количество часов", "Отключение электроэнергии, часов",
-		"Неисправность оборудования, часов",
-		"Сбой программного обеспечения, часов",
-		"Выработка ресурса сенсора, часов",
 		"Отключение для технического обслуживания, часов",
+		"Сбой программного обеспечения, часов",
+
+		"Неисправность оборудования, часов",
+		"Выработка ресурса сенсора, часов",
 		"Отключение для метрологического обслуживания, часов",
 		"Стабильная работа, часов",
 		"Стабильная работа*, %"}
@@ -68,18 +69,18 @@ func create(data DataTable) *xlsx.File {
 			cell := row.AddCell()
 			cell.SetValue(device)
 			cell = row.AddCell()
-			cell.SetFloat(data.AllHours)
+			cell.SetFloatWithFormat(data.AllHours, "0.00")
 			var unstableWork float64
 			for i := 0; i < 6; i++ {
 				cell := row.AddCell()
-				cell.SetFloat(data.Apn[point][device][i])
+				cell.SetFloatWithFormat(data.Apn[point][device][i], "0.00")
 				unstableWork += data.Apn[point][device][i]
 				total[i] += data.Apn[point][device][i]
 			}
 			cell = row.AddCell()
-			cell.SetFloat(data.AllHours - unstableWork)
+			cell.SetFloatWithFormat(data.AllHours-unstableWork, "0.00")
 			cell = row.AddCell()
-			cell.SetFloat(100 - (unstableWork / data.AllHours * 100))
+			cell.SetFloatWithFormat(100-(unstableWork/data.AllHours*100), "0.00")
 			cell.SetStyle(totalStyle)
 		}
 		row := sheet.AddRow()
@@ -87,11 +88,11 @@ func create(data DataTable) *xlsx.File {
 		cell.SetValue("итого")
 		cell.SetStyle(totalStyle)
 		cell = row.AddCell()
-		cell.SetFloat(data.AllHours * float64(len(data.Apn[point])))
+		cell.SetFloatWithFormat(data.AllHours*float64(len(data.Apn[point])), "0.00")
 		for i := 0; i < 6; i++ {
 			cell := row.AddCell()
 			cell.SetStyle(totalStyle)
-			cell.SetFloat(total[i])
+			cell.SetFloatWithFormat(total[i], "0.00")
 		}
 	}
 	return file

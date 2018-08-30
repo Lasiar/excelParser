@@ -27,6 +27,23 @@ func (p *preload) IdReason(find string) int {
 	return -1
 }
 
+func (p *preload) Save() error {
+	file, err := os.Create("preload.json")
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "\t")
+
+	if err := encoder.Encode(p); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (p *preload) Converter() Apn {
 	apn := make(Apn)
 

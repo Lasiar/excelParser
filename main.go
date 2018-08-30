@@ -1,14 +1,15 @@
 package main
 
 import (
+	"log"
 	"net/http"
 )
 
 func main() {
 
 	http.HandleFunc("/add", AddElement)
-	http.HandleFunc("/print", PrintElement)
 	http.HandleFunc("/", ProcessedHandle)
+	http.HandleFunc("/delete", DeleteHandle)
 
-	http.ListenAndServe(":8080", nil)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -15,9 +14,6 @@ type message struct {
 }
 
 func ProcessedHandle(w http.ResponseWriter, r *http.Request) {
-	//w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-	//w.Header().Set("Content-Disposition", "attachment; filename=\"Результаты анализа стабильности оборудования.xlsx\"")
-
 	m := new(message)
 
 	decoder := json.NewDecoder(r.Body)
@@ -27,13 +23,16 @@ func ProcessedHandle(w http.ResponseWriter, r *http.Request) {
 
 	if m.Month == "" {
 		log.Println("bad reqest")
+		return
 	}
 
 	date, err := time.Parse("2006-01", m.Month)
-
 	if err != nil {
 		log.Println(err)
 	}
+
+	w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	w.Header().Set("Content-Disposition", "attachment; filename=\"Результаты анализа стабильности оборудования за "+date.Format("01 2006")+".xlsx\"")
 
 	fmt.Println(m)
 
@@ -65,22 +64,18 @@ func AddElement(w http.ResponseWriter, r *http.Request) {
 		existPre.Apn[k] = append(existPre.Apn[k], pre.Apn[k]...)
 	}
 
-	file, err := os.Create("preload.json")
-	if err != nil {
-		log.Fatal(err)
+	if err := existPre.Save(); err != nil {
+		log.Println(err)
 	}
 
-	defer file.Close()
-
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "\t")
-
-	if err := encoder.Encode(existPre); err != nil {
-		log.Fatal(err)
-	}
 }
 
-func PrintElement(w http.ResponseWriter, r *http.Request) {
-	pre := GetPreload()
-	fmt.Println(pre.Converter())
-}
+//func DeleteHandle(w http.ResponseWriter, r *http.Request){
+//	pre := new(preload)
+//	decoder := json.NewDecoder(r.Body)
+//	if err := decoder.Decode(&pre); err != nil {
+//		log.Fatal(err)
+//	}
+//	existPre := GetPreload()
+//
+//}

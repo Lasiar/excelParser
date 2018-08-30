@@ -91,6 +91,10 @@ func parse(begin, end time.Time, p preload) DataTable {
 
 		dt := float64(t1.Unix()-t0.Unix()) / 3600
 
+		if dt < 0 {
+			log.Println(dt)
+		}
+
 		currentLocateName := cells[locateName].String()
 		currentDeviceName := cells[deviceName].String()
 		currentModel := cells[model].String()
