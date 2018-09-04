@@ -70,7 +70,8 @@ func AddElement(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//func DeleteHandle(w http.ResponseWriter, r *http.Request){
+//func DeleteHandle(w http.ResponseWriter, r *http.Request) {
+//	var err error
 //	pre := new(preload)
 //	decoder := json.NewDecoder(r.Body)
 //	if err := decoder.Decode(&pre); err != nil {
@@ -78,4 +79,31 @@ func AddElement(w http.ResponseWriter, r *http.Request) {
 //	}
 //	existPre := GetPreload()
 //
+//	if pre.Device != nil {
+//		pre.Device, err = remove(existPre.Device, pre.Device)
+//		if err != nil {
+//			return
+//		}
+//	}
+//
+//	if pre.Apn != nil {
+//		pre.Apn, err = remove(existPre.Reason, pre.Reason)
+//
+//	}
+//
+//	if pre.Reason != nil {
+//
+//	}
+//
+//}
+//
+//func remove(slice, s []string) ([]string, error) {
+//	for _, delete := range s {
+//		for i, find := range slice {
+//			if delete == find {
+//				return append(slice[:i], slice[i+1:]...), nil
+//			}
+//		}
+//	}
+//	return nil, fmt.Errorf("не найдено совпадений")
 //}
